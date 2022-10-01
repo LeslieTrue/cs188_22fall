@@ -1,0 +1,1 @@
+python gridworld.py -g DiscountGrid -a value --discount .5 --noise .3 --livingReward 4

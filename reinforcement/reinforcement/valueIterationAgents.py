@@ -65,6 +65,19 @@ class ValueIterationAgent(ValueEstimationAgent):
           value iteration, V_k+1(...) depends on V_k(...)'s.
         """
         "*** YOUR CODE HERE ***"
+        itrs = self.iterations
+        for i in range(itrs):
+            new_val = util.Counter()# temporarily store the value
+            visited = util.Counter()
+            for state in self.mdp.getStates():
+                best_act = self.getPolicy(state)
+                if best_act is not None:
+                    new_val[state] = self.getQValue(state, best_act)
+                    visited[state] = 1
+
+            for state in self.mdp.getStates():
+                if visited[state]:
+                    self.values[state] = new_val[state]
 
     def getValue(self, state):
         """
@@ -78,6 +91,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
+        q_val = .0
+        transit = self.mdp.getTransitionStatesAndProbs(state, action)
+        for new_s, prob in transit:
+            q_val += prob * (self.mdp.getReward(state, action, new_s) + self.discount* self.getValue(new_s))
+        return q_val
         util.raiseNotDefined()
 
     def computeActionFromValues(self, state):
@@ -90,6 +108,22 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
+        best_rew = -1e9
+        best_act = None
+        for act in self.mdp.getPossibleActions(state):
+            transit = self.mdp.getTransitionStatesAndProbs(state, act)
+            rew = .0
+            for new_s,prob in transit:
+                rew += prob*(self.mdp.getReward(state, act, new_s) + self.discount*self.getValue(new_s))
+            if rew > best_rew:
+                best_rew = rew
+                best_act = act
+        
+        if best_act is not None:
+            return best_act
+        else:
+            return None
+
         util.raiseNotDefined()
 
     def getPolicy(self, state):
